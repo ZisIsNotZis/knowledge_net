@@ -52,7 +52,8 @@ data/
 *.npz
 *.parquet
 
-# Editors / OS
+# Local agent state / editors / OS
+.pi/
 .DS_Store
 Thumbs.db
 .idea/
