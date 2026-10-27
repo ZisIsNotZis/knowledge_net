@@ -51,7 +51,7 @@ Then pick a notebook:
 
 - **`Untitled.ipynb`** — the fastest self-contained starting point. It defines the synthetic pointer-chain task in-notebook, so it needs no external corpus. It runs end-to-end but is slow: the 1024-step Python-level memory loop takes roughly 15 seconds per optimization step on the machine where it was checked.
 - **`Untitled-Copy8.ipynb`** — the canonical, most complete snapshot (`KbCell` / `Kb` / `Akb`, data pipeline, training curves). It does **not** run as-is: it expects `../nlpdat/inews/{train,dev,test}.txt`, which is not in this repository.
-- **`Untitled-Copy5/6/7.ipynb`** — data-free variants that generate synthetic arithmetic-string batches.
+- **`Untitled-Copy5/6.ipynb`** — data-free variants that generate their own synthetic arithmetic-string batches. **`Untitled-Copy7.ipynb`** trains the same self-generated task, but its trailing cells poke at the missing `../nlpdat` corpora, so run only the cells above them.
 
 > **CUDA is required by default.** Every notebook begins with `torch.set_default_tensor_type(torch.cuda.FloatTensor)`. On newer PyTorch releases that path is deprecated or removed, so this is usually the first line to change.
 

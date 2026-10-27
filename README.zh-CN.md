@@ -51,7 +51,7 @@ jupyter lab
 
 - **`Untitled.ipynb`** —— 最快的自包含入口。指针链任务直接定义在 notebook 内，不需要外部语料。它能端到端运行，但很慢：在这台机器上，1024 步的 Python 级记忆循环大约需要 15 秒一个优化步。
 - **`Untitled-Copy8.ipynb`** —— 最完整、最典型的快照（`KbCell` / `Kb` / `Akb`、数据管线、训练曲线）。它**不能直接运行**：需要 `../nlpdat/inews/{train,dev,test}.txt`，而这份语料不在仓库里。
-- **`Untitled-Copy5/6/7.ipynb`** —— 不依赖外部数据的变体，自己生成合成算术字符串批次。
+- **`Untitled-Copy5/6.ipynb`** —— 不依赖外部数据的变体，自己生成合成算术字符串批次。**`Untitled-Copy7.ipynb`** 训练的是同一个自生成任务，但它末尾的几格会去读缺失的 `../nlpdat` 语料，只跑前面那些格即可。
 
 > **默认需要 CUDA。** 每个 notebook 开头都是 `torch.set_default_tensor_type(torch.cuda.FloatTensor)`。较新的 PyTorch 已弃用或移除这条路径，所以这通常是最先要改的一行。
 
