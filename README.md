@@ -1,171 +1,132 @@
-# knowledge_net
+<p align="center">
+  <img src="assets/logo.svg" width="112" alt="knowledge_net logo">
+</p>
 
-**What:** A scratch research directory (notebooks, Feb 2026; one module from Dec 2024)
-exploring a single idea — give a sequence model a small **learned key–value memory bank**
-that it reads from by attention and writes to through a learned gate — and test it on
-tasks whose correct answer is *exactly computable*, plus a byte-level Chinese
-next-symbol prediction task.
+<h1 align="center">knowledge_net</h1>
 
-**Why it exists / the problem it was attacking:** the usual ways a sequence model
-carries state are either a single opaque hidden vector (GRU, conv stack) or a KV cache
-that grows with the input (attention). This directory asks whether a small explicit
-bank of memory slots, read selectively by attention and updated by a gate, can hold and
-retrieve discrete bindings (`k → v`, "is `k` still `v`?", follow a pointer chain)
-instead of an opaque state. The tasks are deliberately toy and verifiable so that
-success or failure is unambiguous.
+<p align="center">
+  <em>Attention-read, gate-written key–value memory for sequence models.</em>
+</p>
 
-**Status:** research / archive. Frozen as of Feb 2026; not maintained, never published.
-See `docs/project-status.md` for the classification and the evidence behind it.
+<p align="center">
+  <strong>Small, readable PyTorch notebooks that build the mechanism and test it on tasks with exactly computable answers.</strong>
+</p>
 
-**Is it a novel architecture?** No. Stated plainly: this is **a sketch of a known family
-of ideas**, not a novel architecture and not even a complete experiment. The mechanism
-is an attention-based external memory — the Neural-Turing-Machine / Memory-Networks
-lineage (a read head over a slot bank plus a learned write gate), and the final `Akb`
-variant, which appends a slot every step and attends over everything so far, is close to
-re-deriving attention over a growing KV cache. There is **no citation, no baseline, no
-ablation, and no comparison** to any of that prior work anywhere in the directory, so
-nothing here establishes novelty. It is **a pile of near-duplicate `Untitled-CopyN`
-experiments** — nine manual forks of an `Untitled.ipynb` original (11 notebooks in total
-including `dat.ipynb`) that were edited forward one after another (not byte-identical
-duplicates — each first cell differs; only 6 cell bodies are byte-identical across
-notebooks, all within the closest sibling pairs `Copy6`/`Copy7`, `Copy2`/`Copy3` and
-`Untitled`/`Copy1`). It never got past toy training runs, and the runs that were done were
-not saved with their outputs.
+<p align="center">
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a>
+</p>
 
-## How to run
+<p align="center">
+  Research archive, frozen February 2026 · no published results · AGPL-3.0-only
+</p>
 
-**There is no single entrypoint.** No package, no CLI, no `main`, no tests, no configs,
-no `requirements.txt`. It is notebooks only, and they are meant to be run top-to-bottom
-in Jupyter.
+Can a handful of memory slots hold discrete bindings better than one opaque hidden state? These notebooks build an attention-read, gate-written memory bank in PyTorch and test it on tasks where the correct answer is exactly computable: pointer chains, synthetic arithmetic strings, and byte-level Chinese next-symbol prediction.
+
+This is a **research sketch, not a library and not a novel architecture**. The mechanism belongs to the Neural Turing Machine / Memory Networks lineage, and the append-only variant is close to attention over a growing KV cache. There is no baseline, ablation, or comparison in the repository. The honest status, evidence, and limitations live in [`docs/project-status.md`](docs/project-status.md).
+
+## At a glance
+
+| | |
+|---|---|
+| **Status** | Archived research sketch; not maintained, no releases |
+| **What is here** | 11 Jupyter notebooks + one importable module (`kb.py`) |
+| **Core idea** | A learned bank of key–value slots, read by attention and written through a learned gate |
+| **Tasks** | Pointer chains, synthetic arithmetic strings, byte-level Chinese next-symbol prediction |
+| **Results** | No reproducible results; notebooks have no saved outputs, only embedded curve screenshots |
+| **Requirements** | PyTorch, NumPy, Matplotlib, Jupyter, and a CUDA GPU |
+| **License** | [AGPL-3.0-only](LICENSE) |
+
+## Quick start
+
+There is no package, CLI, `main`, test suite, or `requirements.txt`. The notebooks are meant to be opened and run top-to-bottom in Jupyter.
 
 ```bash
+git clone https://github.com/ZisIsNotZis/knowledge_net.git
+cd knowledge_net
 pip install torch numpy matplotlib
-jupyter lab          # or: jupyter notebook
+jupyter lab
 ```
 
-- **A CUDA GPU is required.** Every notebook's first cell runs
-  `torch.set_default_tensor_type(torch.cuda.FloatTensor)`. On the torch installed here
-  (2.14) this still works but emits a deprecation warning; newer torch releases have
-  removed the CUDA default-tensor-type path, so this call is the first thing that will
-  need editing.
-- **Canonical notebook: `Untitled-Copy8.ipynb`.** It is the last and most complete
-  snapshot: `Nn` / `Linear`(over `Cat`) / `Notice`, `KbCell` / `Kb` / `Akb`, `Red` / `Res`,
-  the `Dat` / `DatNoL` / `DatMock` data pipeline, `Log`, and the **only recorded training
-  curves** in the directory. Its 277 KB is almost entirely three embedded PNGs; the code
-  is ~8.5 KB. It **will not run as-is**: `Dat` loads `../nlpdat/inews/dev.txt`, and cell 4
-  additionally needs `../nlpdat/inews/{test,train}.txt`. That corpus is **not in this
-  directory and not anywhere on the archive** — see below.
-- **Self-contained alternative: `Untitled.ipynb`.** The cleanest end-to-end example: the
-  synthetic pointer-chain task (`qa` / `qas` / `gets` / `unpack`) is defined inside the
-  notebook, so it needs no external data. Verified to execute here (forward, backward and
-  an optimizer step all run). Note that as written it is **impractically slow**: `Kb`
-  loops over the 1024-step sequence in Python with autograd, which measured ~15 s per
-  optimization step on this machine, i.e. hours for the 10,000 steps the scheduler asks
-  for — so I did not run it to convergence, and the first step is at chance. That cost is
-  a plausible reason no results were ever recorded for this notebook.
-- `Untitled-Copy5/6/7.ipynb` are also data-free — they generate their own synthetic
-  arithmetic-string batches with `dat(l, n)`.
+Then pick a notebook:
 
-Suggested reading order (the idea's development, chronologically by file mtime all are
-Feb 2026; `kb.py` is Dec 2024 and is the odd one out):
+- **`Untitled.ipynb`** — the fastest self-contained starting point. It defines the synthetic pointer-chain task in-notebook, so it needs no external corpus. It runs end-to-end but is slow: the 1024-step Python-level memory loop takes roughly 15 seconds per optimization step on the machine where it was checked.
+- **`Untitled-Copy8.ipynb`** — the canonical, most complete snapshot (`KbCell` / `Kb` / `Akb`, data pipeline, training curves). It does **not** run as-is: it expects `../nlpdat/inews/{train,dev,test}.txt`, which is not in this repository.
+- **`Untitled-Copy5/6/7.ipynb`** — data-free variants that generate synthetic arithmetic-string batches.
 
-1. `Untitled.ipynb` — earliest complete form: `Bitention` + `Kb` on the pointer-chain task.
-2. `kb.py` — the same idea extracted into one importable file (see the `cznn` note below).
-3. `Untitled-Copy4.ipynb` — `Seq2Vec` / `Vec2Seq` + `Kb` on a phrased `qa` task.
-4. `Untitled-Copy5/6/7.ipynb` — refactor to `KbCell` / `Kb`, evaluated on synthetic
-   arithmetic strings.
-5. `Untitled-Copy8.ipynb` — final: `Akb` (append-only attention memory) on byte-level
-   Chinese next-symbol prediction, plus the recorded curves.
+> **CUDA is required by default.** Every notebook begins with `torch.set_default_tensor_type(torch.cuda.FloatTensor)`. On newer PyTorch releases that path is deprecated or removed, so this is usually the first line to change.
 
-### The architecture, concretely (`Untitled-Copy8.ipynb`)
+## What it can do now
 
-- `Notice(q, k, h, head)` — attention over memory slots: concatenates `[q, k, position]`
-  (`position = torch.linspace(0, 1, k.size(-2))`) through an MLP and softmaxes over the
-  slot axis.
-- `KbCell(i, h, o, headin, headout)` — `read` (`Notice`) reads the bank; `compute` (MLP)
-  mixes the input with the read; `write` (`Notice`) emits a per-slot gate; `save` (MLP)
-  produces the new slot. Update is `x * w + (1 - w) * a`.
-- `Kb(i, h, o, l, ...)` — fixed-size bank `torch.zeros(l, h)`, consumed step by step.
-- `Akb(i, h, o, head)` — append-only variant: the bank starts empty, each step reads over
-  all earlier slots, emits an output plus a new slot, and appends it.
-- `Bitention` (early form, in `Untitled*`, `kb.py`) — bidirectional read/write attention
-  between the input stream and the memory.
-- Encoders/decoders around the bank: `Seq2Vec` (Conv1d + pooling, or GRU), `Vec2Seq`
-  (ConvTranspose1d upsampling with residual `Exp` blocks), `Seq2Seq`, `Red`, `Res`,
-  `ConvSpace`, and a `Linear` subclass that accepts a `Cat` (multi-input linear =
-  block-sliced weight).
+- **Fixed-size memory banks** — `KbCell` reads from a slot bank with an attention module (`Notice`), mixes the read with the input, emits a per-slot write gate, and updates the bank.
+- **Append-only memory** — `Akb` starts empty, reads over all earlier slots at each step, and appends a new slot.
+- **Bidirectional memory attention** — the earlier `Bitention` / `Kb` form in `kb.py` reads and writes attention between the input stream and memory.
+- **Sequence encoders and decoders** — `Seq2Vec`, `Vec2Seq`, `Seq2Seq`, residual `Res` / `Exp` blocks, `ConvSpace`, and a `Linear` subclass that accepts multiple inputs.
+- **Toy task generators** — pointer chains, phrased `qa` bindings, and synthetic arithmetic strings defined inside the notebooks.
+- **A byte-level Chinese pipeline** — `Dat`, `DatNoL`, and `DatMock`, plus logging and entropy helpers.
 
-## What is here vs. not
+What it does **not** provide: a package, a stable API, tests, configs, checkpoints, a reproducible training script, or a held-out evaluation.
 
-**Here**
+## Architecture
 
-- 11 `.ipynb` notebooks + 1 `.py` module (`kb.py`), 12 files, ~1.5k lines of effective code
-  (the largest file is large only because of embedded PNGs).
-- The architecture definitions, the toy-task generators, and the training loops.
-- Four pasted training-curve screenshots (three in `Untitled-Copy8.ipynb`, one in
-  `dat.ipynb`) and one hand-pasted list of 16 unlabelled numbers
-  (`Untitled-Copy8.ipynb` cell 3, values −7.67 … −19.80 — note cross-entropy cannot be
-  negative, so these are not self-explanatory).
+The core loop is deliberately small:
 
-**Not here**
+```text
+                ┌─────────────── read ───────────────┐
+                │                                    │
+input x_t ──► mix ──► output y_t          memory slots [k_1 … k_n]
+                │                                    ▲
+                └─────────────── write gate ─────────┘
+                         new slot / gated update
+```
 
-- **No written-up results.** No paper, no report, no results table, no test-set metric, no
-  baseline, no ablation, no seeding, no logs.
-- **No reproducible run records.** In every one of the 11 notebooks, every code cell has
-  `execution_count == 0` and **zero stored outputs**. The notebooks were saved without
-  outputs, so the only results are the hand-attached screenshots above. Nothing here can
-  be checked by re-opening a notebook.
-- **No data.** Five notebooks depend on `../nlpdat/inews/{dev,test,train}.txt`. That
-  corpus is absent from this directory and I could not find it anywhere on the archive —
-  so the main training runs, including the ones whose curves are pasted in, **cannot be
-  reproduced**.
-- **No checkpoints, weights, configs, environment files, or tests.** No `LICENSE`.
+The read head scores every memory slot by concatenating the query, the slot, and a position signal, passing them through an MLP, and softmaxing over the slot axis. The write path produces a gate and a candidate slot; the fixed-size variant blends the candidate into the bank, while `Akb` appends it. Encoders and decoders sit around this loop when the task needs sequence-to-sequence modeling.
 
-**What the screenshots appear to show** (unlabelled, no test set, so treat as anecdote,
-not result): one byte-level next-symbol run improving loss ≈4.7 → 2.6 with per-position
-accuracy ≈0.6; one run loss ≈9.7 → 6.2 with per-position accuracy ≈0.9; one plateaued at
-loss ≈2.5 / accuracy ≈0.6. The one run I could re-execute is the data-free `DatMock`
-path: it confirms the graph runs end-to-end, but `DatMock` generates **uniformly random**
-sequences, so ~5.62 nats (≈ `ln 256` = 5.545) with ~0 accuracy is the expected floor and
-says nothing about learning. `dat.ipynb`'s no-memory baseline on real Chinese news barely
-moved (loss 5.038 → 5.025, accuracy 0.067 → 0.0685), i.e. it did not beat a unigram prior.
+For the concrete definitions, start with [`Untitled-Copy8.ipynb`](Untitled-Copy8.ipynb); for the extracted module version, read [`kb.py`](kb.py).
 
-**Rough edges worth knowing before reading the code** (a representative sample, not a
-review): `kb.py`'s `Kb.__init__(s, i, h, l)` sets `s.l = h` — the memory length argument is
-silently dropped. Several loops shadow their own iterator (`for t in range(...): for t in
-range(100)`) and reuse `l` for both "loss" and "length". `Untitled-Copy1.ipynb` calls
-`qas(...)` without defining it. `DatMock` has no `__len__` even though the model builder
-calls `len(a)`. `Untitled-Copy3.ipynb` contains `p = torch.tensor([0.9])` pinned over the
-model's own probability output. `Untitled-Copy3/7.ipynb` contain `%reset -f in out` and
-stray scratch cells (`ord('~')`, `a[[1,2,3,4]] = 4`).
+## How to develop
 
-## Relationship to the author's published `cznn`
+There is no build step. Work directly in Jupyter, and treat each notebook as an experiment snapshot rather than a module.
 
-**No notebook here imports a local `nn` module, and there is no `nn.py` in this directory
-— nothing was deleted.** The dependency runs in neither direction.
+Suggested reading order — the idea's development:
 
-The stylistic lineage is real, though. `kb.py` and the notebooks use the same author's
-signature idiom: `s` for `self`, `from torch.nn import *`, `Sequential` subclasses with a
-one-line `forward`, a `Cat`/`Linear` pair for multi-input linear layers, and `F` as a
-callable-wrapper module. Those same symbols appear in the author's published library
-[`cznn`](https://github.com/ZisIsNotZis/cznn), specifically in its verbatim `neuronloop`
-fork (`cznn/variants_neuronloop.py`: `F`, `Map`, `Cat`, `Nn`, …). But this is **shared
-style and shared vocabulary, not shared code**: the concrete definitions differ (for
-instance `cznn`'s `Map` is a `Sequential` composition wrapper; here `Map` is a
-character/byte tokenizer), and `cznn` contains **no** `Kb`, `Akb`, `KbCell`, `Bitention`
-or `Notice` at all. Treat `knowledge_net` as an **independent sibling** of the `cznn`
-idiom rather than a consumer of `cznn`.
+1. [`Untitled.ipynb`](Untitled.ipynb) — earliest complete form: `Bitention` + `Kb` on the pointer-chain task.
+2. [`kb.py`](kb.py) — the same idea extracted into one importable file.
+3. [`Untitled-Copy4.ipynb`](Untitled-Copy4.ipynb) — `Seq2Vec` / `Vec2Seq` + `Kb` on a phrased `qa` task.
+4. [`Untitled-Copy5.ipynb`](Untitled-Copy5.ipynb), [`Untitled-Copy6.ipynb`](Untitled-Copy6.ipynb), [`Untitled-Copy7.ipynb`](Untitled-Copy7.ipynb) — refactor to `KbCell` / `Kb`, evaluated on synthetic arithmetic strings.
+5. [`Untitled-Copy8.ipynb`](Untitled-Copy8.ipynb) — final snapshot: `Akb` on byte-level Chinese next-symbol prediction, plus the recorded curves.
+
+Before changing code, know the known rough edges: `kb.py` drops the memory-length argument (`s.l = h`), several loops shadow their iterators, `Untitled-Copy1.ipynb` calls an undefined `qas(...)`, and `DatMock` lacks `__len__` even though the model builder calls `len(a)`. These are documented, not hidden.
+
+## How to contribute
+
+The repository is archived, so there is no active maintenance or release process. Issues and forks are welcome, especially:
+
+- reproducing or replacing the missing `inews` corpus,
+- saving notebook outputs so claims can be checked,
+- adding a small test that pins the memory-bank update rule,
+- reviving the sketch as a clean, CPU-runnable experiment.
+
+If you revive it, keep the project's best habit: every claim should be computable or reproducible.
+
+## Roadmap
+
+**Implemented**
+
+- [x] Fixed-size learned memory bank with attention reads and gated writes
+- [x] Append-only attention memory (`Akb`)
+- [x] `Bitention` / `Kb` module extraction in `kb.py`
+- [x] Synthetic pointer-chain, binding, and arithmetic-string tasks
+- [x] Byte-level Chinese data pipeline and training loops
+- [x] Embedded curve screenshots from early runs
+
+**Planned**
+
+- [ ] Nothing while the repository is archived. There is no active roadmap, no promised release, and no maintained API.
+
+**Future vision** — If revived, the useful next step is not a bigger model but a smaller, checkable one: unify the near-duplicate notebooks into a single runnable experiment, restore the missing data or replace it with a generated corpus, add a held-out evaluation, and compare the bank against a plain recurrent state and a KV-cache baseline. That would turn a promising sketch into evidence.
 
 ## Provenance and license
 
-- Source of truth for this copy: the read-only archive directory
-  `<archive>/knowledge_net`, copied with `rsync -a` (excluding `.git`, `__pycache__`,
-  `*.pyc`, `.venv`, `.ipynb_checkpoints`). The copy is byte-identical to the source.
-- **License: none.** There is no `LICENSE` file in the source directory and no license
-  header in any file, so the default applies — all rights reserved. This is a public
-  *repo layout*, not a grant of rights. Do not treat it as open source.
-- **Sanitisation:** the credential gate over this directory returns nothing, and there
-  were **no absolute, user-specific home-directory paths in any copied file** (all paths
-  in the code are relative, e.g. `../nlpdat/inews/dev.txt`), so nothing needed
-  genericising. All paths in this README and in `docs/project-status.md` are written
-  relative or as `<archive>/...` placeholders on purpose.
+The notebooks and `kb.py` are the author's own work; there is no vendored third-party code. The repository was migrated from a local read-only archive, and no secrets or absolute home-directory paths are present.
+
+Licensed under the [GNU Affero General Public License v3.0](LICENSE) (`AGPL-3.0-only`). There are no license headers in the individual source files.
