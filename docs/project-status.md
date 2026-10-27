@@ -51,9 +51,9 @@ form (`Untitled`, `Copy1`–`Copy4`, `kb.py`) and a later `KbCell`/`Kb`/`Akb` fo
 - No write-up, results table, test-set metric, baseline, ablation, seed, or log.
 - No stored notebook outputs: all 11 notebooks have `execution_count == 0` in every code
   cell and zero stored outputs, so the screenshots are the entire result record.
-- No data: `../nlpdat/inews/{dev,test,train}.txt` (and `../nlpdat/bq/dev.txt` in `Copy7`)
-  is referenced by four notebooks — `dat.ipynb`, `Untitled-Copy7/8/8b.ipynb` — and
-  exists neither in this directory nor elsewhere on the archive, so the principal runs
+- No data: four notebooks — `dat.ipynb` and `Untitled-Copy7/8/8b.ipynb` — read
+  `../nlpdat/inews/{dev,test,train}.txt` (`Copy7` also `../nlpdat/bq/dev.txt`). That
+  directory exists neither here nor elsewhere on the archive, so the principal runs
   cannot be reproduced.
 - No checkpoints, weights, configs, `requirements.txt`, tests, or CI.
 
