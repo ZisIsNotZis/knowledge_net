@@ -108,6 +108,9 @@ The repository is archived, so there is no active maintenance or release process
 
 If you revive it, keep the project's best habit: every claim should be computable or reproducible.
 
+What a pull request has to show — since nothing here is checked automatically — is in
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Roadmap
 
 **Implemented**

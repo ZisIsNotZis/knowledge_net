@@ -108,6 +108,9 @@ jupyter lab
 
 如果复活它，请保留这个项目最好的习惯：每个结论都应当可计算或可复现。
 
+这里没有任何自动检查，所以一个 pull request 需要自带哪些证据，见
+[`CONTRIBUTING.md`](CONTRIBUTING.md)。
+
 ## 路线图
 
 **已实现**
