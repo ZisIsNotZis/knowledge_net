@@ -13,7 +13,7 @@ novel architecture, and not a finished experiment either.
 ## Status
 
 Dead / archived. Frozen at Feb 2026 (notebooks) and Dec 2024 (`kb.py`); not maintained,
-never published, never written up, no releases. Development consisted of manually forking
+never written up, no releases. Development consisted of manually forking
 the notebook forward — `Untitled.ipynb` → `Untitled-Copy1..8b.ipynb` — with each fork
 carrying small architectural edits. Two lineages are visible: an early `Bitention`/`Kb`
 form (`Untitled`, `Copy1`–`Copy4`, `kb.py`) and a later `KbCell`/`Kb`/`Akb` form
@@ -65,8 +65,8 @@ form (`Untitled`, `Copy1`–`Copy4`, `kb.py`) and a later `KbCell`/`Kb`/`Akb` fo
   `torch.set_default_tensor_type(torch.cuda.FloatTensor)`; it still works on torch 2.14
   with a deprecation warning but is removed/deprecated on newer torch. No entrypoint, no
   packaging — notebook-only.
-- **Not open source.** No `LICENSE` file or header anywhere; all rights reserved by
-  default. This directory is a publishable public *layout*, not a license grant.
+- **Open source under AGPL-3.0-only.** The repository ships the full
+  [`LICENSE`](../LICENSE) text. Individual source files carry no license headers.
 - **Known rough edges** (representative): `kb.py`'s `Kb.__init__` sets `s.l = h`, dropping
   the memory-length argument; iterator shadowing and `l` reused for loss/length in several
   loops; `Untitled-Copy1.ipynb` calls `qas(...)` without defining it; `DatMock` lacks
