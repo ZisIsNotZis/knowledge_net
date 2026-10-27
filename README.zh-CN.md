@@ -43,7 +43,7 @@
 ```bash
 git clone https://github.com/ZisIsNotZis/knowledge_net.git
 cd knowledge_net
-pip install torch numpy matplotlib
+pip install torch numpy matplotlib jupyterlab
 jupyter lab
 ```
 
